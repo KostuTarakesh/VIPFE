@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { StyleSheet, View, Text, Modal, Alert, TouchableOpacity, Image, Pressable, TextInput } from 'react-native';
+import { StyleSheet, View, Text, Modal, Keyboard, TouchableOpacity, Image, Pressable, TextInput } from 'react-native';
 import { FirebaseRecaptchaVerifierModal } from "expo-firebase-recaptcha";
 import { firebaseConfig } from '../../firebaseConfig'
 import firebase from "firebase/compat/app";
@@ -11,6 +11,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from "@react-navigation/native";
 import { FontAwesome5 } from 'react-native-vector-icons/FontAwesome5';
 import OTPTextView from 'react-native-otp-textinput';
+import axios from "axios";
 
 const Otp = () => {
     const navigation = useNavigation();
@@ -22,24 +23,61 @@ const Otp = () => {
     const phoneInput = useRef(null);
     const [isModalVisible, setModalVisible] = useState(false);
     const [isChecked, setChecked] = useState(false);
+    const [phoneNumbererror, setPhoneNumbererror] = useState('');
 
     const handleCheckboxPress = () => {
         setChecked(!isChecked);
     };
 
     const homeButton = () => {
-        navigation.navigate('bottomtabs');
+        navigation.navigate('register');
     }
 
     const sendVerification = () => {
-        const phoneProvider = new firebase.auth.PhoneAuthProvider();
-        phoneProvider
-            .verifyPhoneNumber(phoneNumber, recaptchaVerifier.current)
-            .then((verificationId) => {
-                setVerificationId(verificationId);
-                setModalVisible(true); // Open the modal after successful verification
-            })
+        if (phoneNumber.length === 0) {
+            setPhoneNumbererror('Please enter a phone number');
+
+        } else {
+            setPhoneNumbererror('');
+
+            const phoneProvider = new firebase.auth.PhoneAuthProvider();
+            phoneProvider
+                .verifyPhoneNumber(phoneNumber, recaptchaVerifier.current)
+                .then((verificationId) => {
+                    setVerificationId(verificationId);
+                    setModalVisible(true); // Open the modal after successful verification
+                })
+                .catch((error) => {
+                    console.error('Verification failed:', error);
+                    // Handle error if needed
+                });
+        }
     };
+
+
+    // const sendVerification = () => {
+    //     const phoneProvider = new firebase.auth.PhoneAuthProvider();
+    //     phoneProvider
+    //         .verifyPhoneNumber(phoneNumber, recaptchaVerifier.current)
+    //         .then((verificationId) => {
+    //             setVerificationId(verificationId);
+
+    //             // Make the axios post call to send the verification code
+    //             axios.post('http://localhost:2001/signup/logindetails', { mobile: phoneNumber })
+    //                 .then(response => {
+    //                     console.log('Verification code sent successfully:', response.data);
+    //                     setModalVisible(true); // Open the modal after successful verification
+    //                 })
+    //                 .catch(error => {
+    //                     console.error('Error sending verification code:', error);
+    //                     // Handle the error or show an error message to the user
+    //                 });
+    //         })
+    //         .catch(error => {
+    //             console.error('Phone number doesnot exist:', error);
+    //             // Handle the error or show an error message to the user
+    //         });
+    // };
 
 
     const confirmCode = () => {
@@ -83,14 +121,31 @@ const Otp = () => {
                 <View style={styles.contain}>
                     <PhoneInput
                         ref={phoneInput}
-                        defaultValue={phoneNumber}
                         containerStyle={styles.phoneContainer}
                         textContainerStyle={styles.texInput}
-                        onChangeFormattedText={(text) => setPhoneNumber(text)}
+                        textInputStyle={styles.mobileText}
+                        onChangeFormattedText={text => {
+                            setPhoneNumber(text);
+                            if (text.length === 13) {
+                                Keyboard.dismiss();
+                            }
+                            setPhoneNumbererror('')
+                        }}
+                        value={phoneNumber}
                         defaultCode="IN"
-                        layout='first'
+                        layout="first"
+                        keyboardType="phone-pad"
+                        withDarkTheme
                         withShadow
+                        onKeyPress={({ nativeEvent }) => {
+                            if (nativeEvent.key === 'Backspace') {
+                                phoneInput.current?.focus();
+                            }
+                        }}
                     />
+                    {phoneNumbererror && (
+                        <Text style={styles.errorText}>{phoneNumbererror}</Text>
+                    )}
                 </View>
                 <Text style={{ fontSize: 20, textAlign: 'center', marginBottom: wp('8%') }}>Don't have an Account ? <Text style={{ color: '#1034a6' }} onPress={homeButton}>Signup</Text></Text>
 
@@ -182,6 +237,9 @@ const styles = StyleSheet.create({
         borderBottomWidth: 3,
         borderBottomColor: '#f9f9f9'
     },
+    errorText: {
+        color: 'red',
+    },
     textInputContainer: {
         marginBottom: 20,
     },
@@ -189,8 +247,8 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         borderWidth: 4,
         borderColor: 'black',
-        width: wp(10),
-        height: hp(5),
+        width: wp(12),
+        height: hp(6),
     },
     modalView: {
         height: hp(45),

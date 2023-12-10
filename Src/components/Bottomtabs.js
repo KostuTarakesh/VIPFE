@@ -1,7 +1,14 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Business from '../screnns/Businessscreen';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import BusinessHome from '../screnns/Business';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import Octicons from 'react-native-vector-icons/Octicons';
+import Reservations from '../screnns/Reservations';
+import Media from '../screnns/Media';
+import Events from '../screnns/Events';
+import Rewards from '../screnns/Rewards';
+import Profile from '../screnns/Profile';
 
 const Tab = createBottomTabNavigator();
 
@@ -21,44 +28,43 @@ export default function Bottomtabs() {
                     ),
                 }}
             />
-            {/* <Tab.Screen
-                name="Notifications"
-                component={Notifications}
+            <Tab.Screen
+                name="reservations"
+                component={Reservations}
                 options={{
                     tabBarLabel: 'Reservations',
                     tabBarIcon: ({ color, size }) => (
-                        <MaterialCommunityIcons name="bell" color={color} size={size} />
+                        <MaterialIcons name="table-bar" color={color} size={size} />
                     ),
-                    tabBarBadge: 3,
                 }}
             />
             <Tab.Screen
-                name="Profile"
-                component={Profile}
+                name="media"
+                component={Media}
                 options={{
                     tabBarLabel: 'Media',
                     tabBarIcon: ({ color, size }) => (
-                        <MaterialCommunityIcons name="account" color={color} size={size} />
+                        <FontAwesome name="file-photo-o" color={color} size={size} />
                     ),
                 }}
             />
             <Tab.Screen
-                name="Profile"
-                component={Profile}
+                name="Events"
+                component={Events}
                 options={{
                     tabBarLabel: 'Events',
                     tabBarIcon: ({ color, size }) => (
-                        <MaterialCommunityIcons name="account" color={color} size={size} />
+                        <MaterialIcons name="event-seat" color={color} size={size} />
                     ),
                 }}
             />
             <Tab.Screen
-                name="Profile"
-                component={Profile}
+                name="rewards"
+                component={Rewards}
                 options={{
                     tabBarLabel: 'Rewerds',
                     tabBarIcon: ({ color, size }) => (
-                        <MaterialCommunityIcons name="account" color={color} size={size} />
+                        <MaterialCommunityIcons name="trophy-variant-outline" color={color} size={size} />
                     ),
                 }}
             />
@@ -68,10 +74,10 @@ export default function Bottomtabs() {
                 options={{
                     tabBarLabel: 'Me',
                     tabBarIcon: ({ color, size }) => (
-                        <MaterialCommunityIcons name="account" color={color} size={size} />
+                        <Octicons name="person" color={color} size={size} />
                     ),
                 }}
-            /> */}
+            />
         </Tab.Navigator>
     );
 }

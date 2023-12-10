@@ -2,6 +2,7 @@ import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
 import { Image, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import LinearGradient from 'react-native-linear-gradient';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const Home = () => {
     const navigation = useNavigation();
@@ -53,21 +54,22 @@ const styles = StyleSheet.create({
         paddingVertical: 40,
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'space-between'
     },
     images: {
-        width: 130,
-        height: 186,
+        width: wp(31),
+        height: hp(25),
         // margin: 10,
         borderRadius: 10,
-    
+
     },
     images2: {
-        width: 110,
-        height: 150,
+        width: wp(27),
+        height: hp(20),
         margin: 20,
         borderRadius: 20,
-        marginVertical:10,
-        
+        marginVertical: 10,
+
     },
     text: {
         flexWrap: 'wrap',
@@ -107,7 +109,7 @@ const styles = StyleSheet.create({
         borderColor: 'yellow',
         margin: 20,
         backgroundColor: "rgba(255, 185, 21, 1)",
-        
+
 
     },
     buttons2: {

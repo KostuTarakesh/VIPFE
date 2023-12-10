@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Image, ImageBackground, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Image, ImageBackground, Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation, useRoute } from "@react-navigation/native";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
@@ -24,49 +24,69 @@ const Registration = () => {
     const [mobileNumberError, setMobileNumberError] = useState('');
     const [userrole, setuserrole] = useState(role);
 
-    const handleRegister = () => {
+    const handleRegister = async () => {
         setNameError('');
         setEmailError('');
         setMobileNumberError('');
 
+        // Validate Name
         if (!name) {
             setNameError('Name is required');
             return;
         }
 
+        // Validate Email
         if (!email) {
             setEmailError('Email is required');
             return;
+        } else {
+            // Check if the email is valid
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                setEmailError('Please enter a valid email');
+                return;
+            }
         }
 
+        // Validate Mobile Number
         if (!mobileNumber) {
             setMobileNumberError('Mobile Number is required');
             return;
+        } else {
+            // Check if the mobile number is valid
+            const mobileRegex = /^\d{10}$/;
+            if (!mobileRegex.test(mobileNumber)) {
+                setMobileNumberError('Mobile number must be 10 digits');
+                return;
+            }
         }
 
-        const userData = {
-            name: name,
-            email: email,
-            mobile: mobileNumber,
-            role: userrole,
-        };
+        try {
+            // If all inputs are valid, make the POST request
+            const userData = {
+                name: name,
+                email: email,
+                mobile: mobileNumber,
+                role: userrole,
+            };
 
-        axios.post('http://localhost:2001/signup/signup', userData)
-            .then(response => {
-                console.log('Signup successful:', response.data);
-                navigation.navigate('Otp');
-                setEmail('');
-                setMobileNumber('');
-                setName('');
-                setuserrole('')
-            })
-            .catch(error => {
-                console.error('Signup failed:', error);
-                setEmail('');
-                setMobileNumber('');
-                setName('');
-            });
+            const response = await axios.post('http://localhost:2001/signup/signup/', userData);
+
+            console.log('Signup successful:', response.data);
+            navigation.navigate('Otp');
+            setEmail('');
+            setMobileNumber('');
+            setName('');
+            setuserrole('');
+        } catch (error) {
+            console.error('Signup failed:', error);
+            setEmail('');
+            setMobileNumber('');
+            setName('');
+        }
     };
+
+
 
     const registerButton = () => {
         navigation.navigate('Otp');
@@ -85,7 +105,7 @@ const Registration = () => {
 
             <ImageBackground source={require('../../assets/images/VIPmebg.png')} resizeMode="cover" style={styles.background}>
                 <View style={styles.container}>
-                    <FontAwesome5 name="arrow-left" color="#111111" size={30} onPress={homeButton} style={{ padding: 40 }} />
+                    <FontAwesome5 name="arrow-left" color="#111111" size={30} onPress={homeButton} style={{ paddingHorizontal: 40, paddingVertical: 20 }} />
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                         <Image source={user} style={{ height: 60, width: 60 }} />
                         <Text style={styles.text}>SignUp</Text>
@@ -128,13 +148,18 @@ const Registration = () => {
                                 value={mobileNumber}
                                 placeholder="Enter your Mobile Number"
                                 style={styles.textInput}
+                                keyboardType="numeric"
                                 onChangeText={(text) => {
                                     setMobileNumber(() => {
                                         setMobileNumberError('');
-                                        return text;
+                                        if (text.length === 10) {
+                                            Keyboard.dismiss();
+                                        }
+                                        return text.slice(0, 10);
                                     });
                                 }}
                             />
+
                         </View>
                         {mobileNumberError ? <Text style={styles.errorText}>{mobileNumberError}</Text> : null}
                     </View>
