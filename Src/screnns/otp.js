@@ -1,10 +1,9 @@
 import React, { useRef, useState } from "react";
-import { StyleSheet, View, Text, Modal, Keyboard, TouchableOpacity, Image, Pressable, TextInput } from 'react-native';
+import { StyleSheet, View, Text, Modal, Keyboard, TouchableOpacity, Image, Pressable, ImageBackground } from 'react-native';
 import { FirebaseRecaptchaVerifierModal } from "expo-firebase-recaptcha";
 import { firebaseConfig } from '../../firebaseConfig'
 import firebase from "firebase/compat/app";
 import PhoneInput from 'react-native-phone-number-input';
-import { ImageBackground } from "react-native";
 import { CheckBox } from '@rneui/themed';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -33,51 +32,72 @@ const Otp = () => {
         navigation.navigate('register');
     }
 
+    // const sendVerification = () => {
+    //     if (phoneNumber.length === 0) {
+    //         setPhoneNumbererror('Please enter a phone number');
+
+    //     } else {
+    //         setPhoneNumbererror('');
+
+    //         const phoneProvider = new firebase.auth.PhoneAuthProvider();
+    //         phoneProvider
+    //             .verifyPhoneNumber(phoneNumber, recaptchaVerifier.current)
+    //             .then((verificationId) => {
+    //                 setVerificationId(verificationId);
+    //                 setModalVisible(true); // Open the modal after successful verification
+    //             })
+    //             .catch((error) => {
+    //                 console.error('Verification failed:', error);
+    //                 // Handle error if needed
+    //             });
+    //     }
+    // };
+
+
     const sendVerification = () => {
-        if (phoneNumber.length === 0) {
-            setPhoneNumbererror('Please enter a phone number');
+        const phoneProvider = new firebase.auth.PhoneAuthProvider();
+        phoneProvider
+            .verifyPhoneNumber(phoneNumber, recaptchaVerifier.current)
+            .then((verificationId) => {
+                setVerificationId(verificationId);
 
-        } else {
-            setPhoneNumbererror('');
-
-            const phoneProvider = new firebase.auth.PhoneAuthProvider();
-            phoneProvider
-                .verifyPhoneNumber(phoneNumber, recaptchaVerifier.current)
-                .then((verificationId) => {
-                    setVerificationId(verificationId);
-                    setModalVisible(true); // Open the modal after successful verification
+                // Make the axios post call to send the verification code
+                fetch('http://192.168.1.110:2001/signup/logindetails/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ mobile: phoneNumber }),
                 })
-                .catch((error) => {
-                    console.error('Verification failed:', error);
-                    // Handle error if needed
-                });
-        }
+                    .then(response => {
+                        if (response.ok) {
+                            console.log('Verification code sent successfully:', response.data);
+                            setModalVisible(true); // Open the modal after successful verification
+                        } else {
+                            // Handle the case where the response is not OK
+                            console.error('Error sending verification code:', response.statusText);
+                            // You can show an error message or take appropriate action
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error sending verification code:', error);
+                        // Check if the error is due to mobile number not existing
+                        if (error.status === 400 && error.message === 'Failed: Mobile number does not exist') {
+                            // Handle the case where the mobile number does not exist
+                            // You can show an error message or take appropriate action
+                        } else {
+                            // Handle other errors
+                            // You can show a general error message or take appropriate action
+                        }
+                    });
+            })
+            .catch(error => {
+                console.error('Phone number does not exist:', error);
+                // Handle the error or show an error message to the user
+            });
     };
 
 
-    // const sendVerification = () => {
-    //     const phoneProvider = new firebase.auth.PhoneAuthProvider();
-    //     phoneProvider
-    //         .verifyPhoneNumber(phoneNumber, recaptchaVerifier.current)
-    //         .then((verificationId) => {
-    //             setVerificationId(verificationId);
-
-    //             // Make the axios post call to send the verification code
-    //             axios.post('http://localhost:2001/signup/logindetails', { mobile: phoneNumber })
-    //                 .then(response => {
-    //                     console.log('Verification code sent successfully:', response.data);
-    //                     setModalVisible(true); // Open the modal after successful verification
-    //                 })
-    //                 .catch(error => {
-    //                     console.error('Error sending verification code:', error);
-    //                     // Handle the error or show an error message to the user
-    //                 });
-    //         })
-    //         .catch(error => {
-    //             console.error('Phone number doesnot exist:', error);
-    //             // Handle the error or show an error message to the user
-    //         });
-    // };
 
 
     const confirmCode = () => {

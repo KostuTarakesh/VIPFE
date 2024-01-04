@@ -7,6 +7,8 @@ import Home from "./Src/screnns/Homescreen";
 import Otp from "./Src/screnns/otp";
 import Business from "./Src/screnns/Businessscreen";
 import Bottomtabs from "./Src/components/Bottomtabs";
+import Loginscreen from "./Src/screnns/Loginscreen";
+import CountryDropdown from "./Src/screnns/Country";
 
 const Stack = createNativeStackNavigator();
 
@@ -14,12 +16,14 @@ const App = () => {
   return (
     <>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="Home">
+        <Stack.Navigator initialRouteName="Country">
           <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
           <Stack.Screen name="Business" component={Business} options={{ headerShown: false }} />
           <Stack.Screen name="Otp" component={Otp} options={{ headerShown: false }} />
           <Stack.Screen name="register" component={Registration} options={{ headerShown: false }} />
           <Stack.Screen name="bottomtabs" component={Bottomtabs} options={{ headerShown: false }} />
+          <Stack.Screen name="login" component={Loginscreen} options={{ headerShown: false }} />
+          <Stack.Screen name="Country" component={CountryDropdown} options={{ headerShown: false }} />
         </Stack.Navigator>
       </NavigationContainer>
 
